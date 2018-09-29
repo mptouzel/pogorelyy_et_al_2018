@@ -2,7 +2,7 @@
 code associated to publication
 
 ## Description
-# Code producing tables of significantly expanded clones from Pogorely et al. "Precise tracking of vaccine-responding T-cell clones reveals convergent and personalized response in identical twins" 
+Code producing tables of significantly expanded clones from Pogorely et al. "Precise tracking of vaccine-responding T-cell clones reveals convergent and personalized response in identical twins" 
 N.B. It is presented here for the review process only. A user-oriented version can be found with Puelma Touzel et al. (in preparation).
 
 ## Contents
