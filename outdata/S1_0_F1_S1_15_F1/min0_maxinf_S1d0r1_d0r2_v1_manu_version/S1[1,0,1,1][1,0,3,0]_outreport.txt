@@ -1,0 +1,16 @@
+outputting to outdata/S1_0_F1_S1_15_F1/min0_maxinf_S1d0r1_d0r2_v1_manu_version/
+running test pair: S1d0r1_d15r1
+N_II/N_I=1.17102966841f2s_step:2smax:25.3284360229, ds:0.101313744092
+calc Pn1n2_s: elapsed 23.0
+calc surface: 
+optalp=0.0542394294707 (0.001,0.99),optsbar=0.797894736842, (0.01,5.0) 
+elapsed 25.0
+write table:  elapsed 43.0
+program elapsed:2739.79479313547539,  0.33936213,  1.05956451,  6.6607978 ],
+       [-2.04546557,  0.33930772,  1.05958029,  6.66074892]]), array([ 1.6598415,  1.6598415,  1.6598415,  1.6598415,  1.6598415]))
+nfev:421
+fun:1.65984150231
+x:[-2.04547196  0.3393392   1.05958629  6.66076071]
+message:Optimization terminated successfully.
+nit:247
+elapsed 2593.0
