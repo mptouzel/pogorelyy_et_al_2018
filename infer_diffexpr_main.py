@@ -21,8 +21,6 @@ def main(null_pair_1,null_pair_2,test_pair_1,test_pair_2,rootpath):
     
 ######################################Preprocessing###########################################3
 
-    repstrvec = ('1', '2')
-
     # filter counts (default no filtering)
     mincount = 0
     maxcount = np.Inf
@@ -42,19 +40,18 @@ def main(null_pair_1,null_pair_2,test_pair_1,test_pair_2,rootpath):
     # Start Computations
     starttime = time.time()
     
-    null_pair_1=null_pair_1.split('.')[0]
-    null_pair_2=null_pair_2.split('.')[0]
-    test_pair_1=test_pair_1.split('.')[0]
-    test_pair_2=test_pair_2.split('.')[0]
+    null_pair_1=null_pair_1.split('.')[0][:-1]
+    null_pair_2=null_pair_2.split('.')[0][:-1]
+    test_pair_1=test_pair_1.split('.')[0][:-1]
+    test_pair_2=test_pair_2.split('.')[0][:-1]
     #learn null paras on specified null pair, then load test pair data
     for it,dataset_pair in enumerate(((null_pair_1,null_pair_2),(test_pair_1,test_pair_2))):
-      
         #read in data with heterogeneous labelling
 	headerline=0
 	colnames = [u'Clone fraction',u'Clone count',u'N. Seq. CDR3',u'AA. Seq. CDR3'] 
-	print(dataset_pair[0].split('_'))
-	donor1,day1str,rep1,_=dataset_pair[0].split('_')
-	donor2,day2,rep2,_=dataset_pair[1].split('_')
+	print(dataset_pair[0].split('_')+dataset_pair[1].split('_'))
+	donor1,day1,rep1=dataset_pair[0].split('_')
+	donor2,day2,rep2=dataset_pair[1].split('_')
 	assert donor1==donor2, 'trying to compare data from different donors!'
 	donorstr=donor1
 
@@ -63,7 +60,7 @@ def main(null_pair_1,null_pair_2,test_pair_1,test_pair_2,rootpath):
 	#input path    
 	datasetstr=dataset_pair[0]+'_'+dataset_pair[1] 
 	
-	loadnull=False
+	loadnull=True
 	if (not loadnull and it==0) or it==1:
 	  
 	    if it==0:
@@ -83,7 +80,7 @@ def main(null_pair_1,null_pair_2,test_pair_1,test_pair_2,rootpath):
 		
 	    #write shelloutput to file
 	    outtxtname='_'.join((null_pair_1,null_pair_2,test_pair_1,test_pair_2,'outreport.txt'))
-	    outputtxtfile=open(outtxtname, 'w')
+	    outputtxtfile=open(path+outtxtname, 'w')
 	    outputtxtfile.write('outputting to ' + outpath+'\n')
 	    if it==0:
 		outputtxtfile.write("running null pair: "+datasetstr+'\n')
@@ -91,7 +88,7 @@ def main(null_pair_1,null_pair_2,test_pair_1,test_pair_2,rootpath):
 		outputtxtfile.write("running test pair: "+datasetstr+'\n')
 
 	    # import and structure data into a dataframe:
-	    Nclones_samp,subset=import_data(datarootpath,dataset_pair[0]+'.txt',dataset_pair[1]+'.txt',mincount,maxcount,colnames,headerline)
+	    Nclones_samp,subset=import_data(datarootpath,dataset_pair[0]+'_.txt',dataset_pair[1]+'_.txt',mincount,maxcount,colnames,headerline)
 	    
 	    #transform to sparse representation
 	    indn1_d,indn2_d,countpaircounts_d,unicountvals_1_d,unicountvals_2_d,NreadsI_d,NreadsII_d=get_sparserep(subset.loc[:,['Clone_count_1','Clone_count_2']])       
@@ -141,8 +138,6 @@ def main(null_pair_1,null_pair_2,test_pair_1,test_pair_2,rootpath):
 		np.save(outpath + 'paras', paras) #null paras to use from here on
 	else:
 	    datasetstr_null=datasetstr
-	    foutname1 = prepath + day1str + '_F' + rep1str 
-	    foutname2 = prepath + day2str + '_F' + rep2str
 	    runstr = 'min' + str(mincount) + '_max' + str(maxcount) + '_' + parvernull
 	    outpath = path + dataset_pair[0] + '_' + dataset_pair[1] + '/' + runstr + '/'
 	    paras=	np.load(outpath+'optparas.npy') #
@@ -239,4 +234,3 @@ if __name__ == "__main__":
     inputtest_1=sys.argv[3]
     inputtest_2=sys.argv[4]
     main(inputnull_1,inputnull_2,inputtest_1,inputtest_2,rootpath)
-
