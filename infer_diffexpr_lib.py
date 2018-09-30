@@ -62,14 +62,13 @@ def get_sparserep(counts):
   
     return indn1,indn2,clonecountpair_counts,unicountvals_1,unicountvals_2,NreadsI,NreadsII
 
-def import_data(path,filename1,filename2,mincount,maxcount,colnames1,colnames2,headerline1,headerline2):
-    columns2use1=colnames1 
-    columns2use2=colnames2
+def import_data(path,filename1,filename2,mincount,maxcount,colnames,headerline):
+    columns2use=colnames
     newnames=['Clone_fraction','Clone_count','ntCDR3','AACDR3']    
     with open(path+filename1, 'r') as f:
-        F1Frame_chunk=pd.read_csv(f,delimiter='\t',usecols=columns2use1,header=headerline1)[columns2use1]
+        F1Frame_chunk=pd.read_csv(f,delimiter='\t',usecols=columns2use,header=headerline)[columns2use]
     with open(path+filename2, 'r') as f:
-        F2Frame_chunk=pd.read_csv(f,delimiter='\t',usecols=columns2use2,header=headerline2)[columns2use2]
+        F2Frame_chunk=pd.read_csv(f,delimiter='\t',usecols=columns2use,header=headerline)[columns2use]
     F1Frame_chunk.columns=newnames
     F2Frame_chunk.columns=newnames
     suffixes=('_1','_2')

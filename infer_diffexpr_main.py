@@ -10,11 +10,11 @@ import pandas as pd
 
 #control python multiprocessing:
 mkl_rt = ctypes.CDLL('libmkl_rt.so')
-num_threads=1 #can set to number of available cores
+num_threads=8 #can set to number of available cores
 mkl_set_num_threads = mkl_rt.MKL_Set_Num_Threads(num_threads)
 print(str(num_threads)+' cores available')
   
-def main(donorstr, null_pair,test_pair,rootpath):
+def main(null_pair_1,null_pair_2,test_pair_1,test_pair_2,rootpath):
   
     parvernull = 'v1_manu_version'
     parvertest = 'v1_manu_version'
@@ -42,48 +42,26 @@ def main(donorstr, null_pair,test_pair,rootpath):
     # Start Computations
     starttime = time.time()
     
+    null_pair_1=null_pair_1.split('.')[0]
+    null_pair_2=null_pair_2.split('.')[0]
+    test_pair_1=test_pair_1.split('.')[0]
+    test_pair_2=test_pair_2.split('.')[0]
     #learn null paras on specified null pair, then load test pair data
-    for it,dataset_pair in enumerate((null_pair,test_pair)):
+    for it,dataset_pair in enumerate(((null_pair_1,null_pair_2),(test_pair_1,test_pair_2))):
       
-	#read in data with heterogeneous labelling
-	if 'S2' in donorstr:
-	    headerline1 = 1
-	    colnames1   = ['Percentage','Read count','CDR3 nucleotide sequence','CDR3 amino acid sequence'] 
-	    postpath1   = '_R2.t1.cf.fastq.gz.txt'
-	    headerline2 = 1
-	    colnames2   = ['Percentage','Read count','CDR3 nucleotide sequence','CDR3 amino acid sequence'] 
-	    postpath2   = '_R2.t1.cf.fastq.gz.txt'
-	    if it==1 and dataset_pair[2]==5: # 2 yr data
-		headerline2 = 0
-		colnames2   = [u'cloneFraction',u'cloneCount',u'nSeqCDR3',u'aaSeqCDR3'] 
-		postpath2   = '_short.txt'
-	else:
-	    headerline1=0
-	    colnames1 = [u'Clone fraction',u'Clone count',u'N. Seq. CDR3',u'AA. Seq. CDR3'] 
-	    postpath1 = '_.txt'
-	    headerline2=0
-	    colnames2 = [u'Clone fraction',u'Clone count',u'N. Seq. CDR3',u'AA. Seq. CDR3'] 
-	    postpath2 = '_.txt'
-	    
-	prepath = donorstr+'_'   
+        #read in data with heterogeneous labelling
+	headerline=0
+	colnames = [u'Clone fraction',u'Clone count',u'N. Seq. CDR3',u'AA. Seq. CDR3'] 
+	print(dataset_pair[0].split('_'))
+	donor1,day1str,rep1,_=dataset_pair[0].split('_')
+	donor2,day2,rep2,_=dataset_pair[1].split('_')
+	assert donor1==donor2, 'trying to compare data from different donors!'
+	donorstr=donor1
+
 	datarootpath='Yellow_fever/' 
-	daystrvec = ('pre0', '0', '7', '15', '45', '700')
 	
 	#input path    
-	dayit1 = dataset_pair[0]
-	rep1 = dataset_pair[1]
-	dayit2 = dataset_pair[2]
-	rep2 = dataset_pair[3]
-	day1str = daystrvec[dayit1]
-	day2str = daystrvec[dayit2]
-	rep1str = repstrvec[rep1]
-	rep2str = repstrvec[rep2]
-	datasetstr=donorstr+'d' + day1str + 'r' +rep1str + '_' + 'd' + day2str + 'r' + rep2str
-	    
-	filename1 = prepath + day1str + '_F' + rep1str + postpath1
-	filename2 = prepath + day2str + '_F' + rep2str + postpath2
-	foutname1 = prepath + day1str + '_F' + rep1str 
-	foutname2 = prepath + day2str + '_F' + rep2str    
+	datasetstr=dataset_pair[0]+'_'+dataset_pair[1] 
 	
 	loadnull=False
 	if (not loadnull and it==0) or it==1:
@@ -99,13 +77,12 @@ def main(donorstr, null_pair,test_pair,rootpath):
 		print("running test pair: "+datasetstr)
 
 	    runstr = 'min' + str(mincount) + '_max' + str(maxcount) + '_' + parver
-	    outpath = path + foutname1 + '_' + foutname2 + '/' + runstr + '/'
+	    outpath = path + dataset_pair[0] + '_' + dataset_pair[1] + '/' + runstr + '/'
 	    if not os.path.exists(outpath):
 		os.makedirs(outpath)
-	    shutil.copy('infer_diffexpr_main.py',outpath+'infer_diffexpr_main.py')
-	    shutil.copy('infer_diffexpr_lib.py',outpath+'infer_diffexpr_lib.py')
+		
 	    #write shelloutput to file
-	    outtxtname=donorstr+str(null_pair).replace(" ", "")+str(test_pair).replace(" ", "")+'_outreport.txt'
+	    outtxtname='_'.join((null_pair_1,null_pair_2,test_pair_1,test_pair_2,'outreport.txt'))
 	    outputtxtfile=open(outtxtname, 'w')
 	    outputtxtfile.write('outputting to ' + outpath+'\n')
 	    if it==0:
@@ -114,7 +91,7 @@ def main(donorstr, null_pair,test_pair,rootpath):
 		outputtxtfile.write("running test pair: "+datasetstr+'\n')
 
 	    # import and structure data into a dataframe:
-	    Nclones_samp,subset=import_data(datarootpath,filename1,filename2,mincount,maxcount,colnames1,colnames2,headerline1,headerline2)
+	    Nclones_samp,subset=import_data(datarootpath,dataset_pair[0]+'.txt',dataset_pair[1]+'.txt',mincount,maxcount,colnames,headerline)
 	    
 	    #transform to sparse representation
 	    indn1_d,indn2_d,countpaircounts_d,unicountvals_1_d,unicountvals_2_d,NreadsI_d,NreadsII_d=get_sparserep(subset.loc[:,['Clone_count_1','Clone_count_2']])       
@@ -167,7 +144,7 @@ def main(donorstr, null_pair,test_pair,rootpath):
 	    foutname1 = prepath + day1str + '_F' + rep1str 
 	    foutname2 = prepath + day2str + '_F' + rep2str
 	    runstr = 'min' + str(mincount) + '_max' + str(maxcount) + '_' + parvernull
-	    outpath = path + foutname1 + '_' + foutname2 + '/' + runstr + '/'
+	    outpath = path + dataset_pair[0] + '_' + dataset_pair[1] + '/' + runstr + '/'
 	    paras=	np.load(outpath+'optparas.npy') #
 	    print(paras)
     ###############################diffexpr learning
@@ -188,7 +165,7 @@ def main(donorstr, null_pair,test_pair,rootpath):
     #compute conditional
     outputtxtfile.write('calc Pn1n2_s: ')
     st = time.time()
-    if 		.path.exists(outpath+'Pn1n2_s_d.npy'):
+    if os.path.exists(outpath+'Pn1n2_s_d.npy'):
 	Pn1n2_s=np.load(outpath+'Pn1n2_s_d.npy')
 	Pn0n0_s=np.load(outpath+'Pn0n0.npy')
     else:
@@ -253,15 +230,13 @@ def main(donorstr, null_pair,test_pair,rootpath):
     endtime = time.time()
     outputtxtfile.write('program elapsed:' + str(endtime - starttime))
     outputtxtfile.close()
-    shutil.copy2(outtxtname,outpath+outtxtname)
     
 if __name__ == "__main__": 
     rootpath=''   
-    assert(len(sys.argv)==9)
-    if test_pair==None:
-	print('must define test pair!')
-    donor=sys.argv[1]
-    inputnull=[int(x) for x in sys.argv[2:6]]
-    inputtest=[int(x) for x in sys.argv[6:]]
-    main(donor,inputnull,inputtest,rootpath)
+    assert len(sys.argv)==5, 'incorrect number of input arguments!'
+    inputnull_1=sys.argv[1]
+    inputnull_2=sys.argv[2]
+    inputtest_1=sys.argv[3]
+    inputtest_2=sys.argv[4]
+    main(inputnull_1,inputnull_2,inputtest_1,inputtest_2,rootpath)
 
