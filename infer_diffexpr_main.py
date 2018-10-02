@@ -55,7 +55,7 @@ def main(null_pair_1,null_pair_2,test_pair_1,test_pair_2,rootpath):
 	#input path    
 	datasetstr=dataset_pair[0]+'_'+dataset_pair[1] 
 	
-	loadnull=True
+	loadnull=False
 	if (not loadnull and it==0) or it==1:
 	  
 	    if it==0:
