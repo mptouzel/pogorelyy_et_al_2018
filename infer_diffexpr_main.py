@@ -7,12 +7,6 @@ from scipy.optimize import minimize
 import os
 import ctypes
 import pandas as pd
-
-#control python multiprocessing:
-mkl_rt = ctypes.CDLL('libmkl_rt.so')
-num_threads=8 #can set to number of available cores
-mkl_set_num_threads = mkl_rt.MKL_Set_Num_Threads(num_threads)
-print(str(num_threads)+' cores available')
   
 def main(null_pair_1,null_pair_2,test_pair_1,test_pair_2,rootpath):
   
@@ -49,7 +43,8 @@ def main(null_pair_1,null_pair_2,test_pair_1,test_pair_2,rootpath):
         #read in data with heterogeneous labelling
 	headerline=0
 	colnames = [u'Clone fraction',u'Clone count',u'N. Seq. CDR3',u'AA. Seq. CDR3'] 
-	print(dataset_pair[0].split('_')+dataset_pair[1].split('_'))
+	print(dataset_pair[0].split('_'))
+        print(dataset_pair[1].split('_'))
 	donor1,day1,rep1=dataset_pair[0].split('_')
 	donor2,day2,rep2=dataset_pair[1].split('_')
 	assert donor1==donor2, 'trying to compare data from different donors!'
@@ -216,8 +211,9 @@ def main(null_pair_1,null_pair_2,test_pair_1,test_pair_2,rootpath):
     Psopt=np.load(outpath + 'Psopt.npy')
     
     pval_expanded=True #which end of the rank list to pull out. else: most contracted
-    pval_threshold=0.1 #output all clones with pval below this threshold
-    save_table(outpath+datasetstr+"table",pval_expanded,pval_threshold,svec, Psopt, Pn1n2_s, Pn0n0_s,subset,unicountvals_1_d,unicountvals_2_d,indn1_d,indn2_d)
+    pval_threshold=0.05  #output all clones with pval below this threshold
+    smed_threshold=3.46 #ln(32)
+    save_table(outpath+datasetstr+"table",pval_expanded,smed_threshold,pval_threshold,svec, Psopt, Pn1n2_s, Pn0n0_s,subset,unicountvals_1_d,unicountvals_2_d,indn1_d,indn2_d)
     et=time.time()
     outputtxtfile.write(" elapsed " + str(np.round(et - st))+'\n')
 

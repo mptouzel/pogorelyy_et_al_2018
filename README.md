@@ -8,17 +8,15 @@ N.B. It is presented here for the review process only. A user-oriented version c
 ## Contents
 Code consists of a main python script (infer_diff_main.py), which makes use of functions contained in a function library file (infer_diff_lib.py). 
 
-## Dependencies
-The functions make use of the numpy, scipy, and pandas packages already shipped with many python scientific computing distributions (e.g. anaconda). 
+## Instructions to install and run code on an example
+1. install python 2.7 (https://www.python.org/download/releases/2.7/) on your system with the following dependecies: numpy, scipy, and pandas packages. This is accomplished most easily by installing a python scientific computing distributions, e.g. anaconda: https://www.anaconda.com/download/), which come with these packages already. On linux, this amounts to downloadling and running the installer:
+> `bash Anaconda-latest-Linux-x86_64.sh`
+2. download the repository and unarchive Yellow fever/Yellow_fever_S1_example test folder
+3. run following command in the repository rootpath (the first two arguments are the paths to the data files of the desired null model pair: biological replicates of day 0; the third and fourth arguments are the first and second time point to be compared), from the folder with repository
+> `python infer_diff_main.py S1_0_F1_.txt S1_0_F2_.txt S1_0_F1_.txt _S1_15_F1_.txt`
+   
+   This produces the results for a day0-day15 comparison using the first replicate of both, and using the day 0-replicate 1 and day 0-replicate 2 null model.
+4. Final output is located in outdata/S1_0_F1_S1_15_F1/min0_maxinf_S1_0_F1_S1_0_F2_v1_manu_version/S1_0_F1_S1_15_F1_tabletop_expanded.csv
 
-## Script usage and behavior
+## Script behavior and output
 This main script reads in files from a folder ('Yellow_fever') containing the processed data of RNA molecule counts and produces a folder structure (with parent folder 'outdata') into which the output data is written, including the final result as a .csv file containing the list of expanded clones with their features. Downstream analysis extracts the subset of this list by selecting clones having the non-expansion probability, _1-P(s>0)_, below 0.05 and the median _s_, _s{med}_, greater than _\log_e(2^5)_ (approximately _3.46_).The data in 'Yellow fever' has been been compressed to faciliate download of the code. 
-
-The main script takes 4 command-line input arguments specifiying the datasets on which to learn. The first two specify the two file names of the data sets used for null model, and the second two specify the filenames of the pair of data sets to be compared. 
-
-## Example
-We have pulled out an example dataset (day 0 and day 15 of donor S1) in the Yellow_fever folder so that running
-
-python infer_diff_main.py S1_0_R1_.txt S1_0_R2_.txt S1_0_R1_.txt S1_15_R1_.txt
-
-produces the results for a day0-day15 comparison using the first replicate of both, and using the day 0-replicate 1 and day 0-replicate 2 null model.

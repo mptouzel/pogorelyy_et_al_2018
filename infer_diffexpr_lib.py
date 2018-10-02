@@ -257,7 +257,7 @@ def get_Pn1n2_s(paras, svec, unicountvals_1, unicountvals_2, NreadsI, NreadsII, 
 def callbackF(Xi):
     print('{0: 3.6f}   {1: 3.6f}   {2: 3.6f}   {3: 3.6f} '.format(Xi[0], Xi[1], Xi[2], Xi[3])+'\n')
     
-def save_table(outpath, print_expanded, pthresh, svec, Ps,Pn1n2_s, Pn0n0_s,  subset, unicountvals_1_d, unicountvals_2_d,indn1_d,indn2_d):
+def save_table(outpath, print_expanded, smedthresh,pthresh, svec, Ps,Pn1n2_s, Pn0n0_s,  subset, unicountvals_1_d, unicountvals_2_d,indn1_d,indn2_d):
     Psn1n2_ps=Pn1n2_s*Ps[:,np.newaxis,np.newaxis] 
     
     #compute marginal likelihood (neglect renormalization , since it cancels in conditional below) 
@@ -274,7 +274,7 @@ def save_table(outpath, print_expanded, pthresh, svec, Ps,Pn1n2_s, Pn0n0_s,  sub
     cdflabel=r'$1-P(s>0)$'
     subset[cdflabel]=subset.apply(dummy_part, axis=1)
     subset=subset[subset[cdflabel]<pthresh].reset_index(drop=True)
-    
+
     data_pairs_ind_1=np.zeros((len(subset),),dtype=int)
     data_pairs_ind_2=np.zeros((len(subset),),dtype=int)
     for it in range(len(subset)):
@@ -309,6 +309,8 @@ def save_table(outpath, print_expanded, pthresh, svec, Ps,Pn1n2_s, Pn0n0_s,  sub
     oldcolnames=( 'AACDR3',  'ntCDR3', 'Clone_count_1', 'Clone_count_2', 'Clone_fraction_1', 'Clone_fraction_2')
     newcolnames=('CDR3_AA', 'CDR3_nt',        r'$n_1$',        r'$n_2$',           r'$f_1$',           r'$f_2$')
     subset=subset.rename(columns=dict(zip(oldcolnames, newcolnames)))
+    
+    subset=subset[subset[r'$s_{2,med}$']>3.46]
     print("writing to: "+outpath)
     if print_expanded:
         subset=subset.sort_values(by=cdflabel,ascending=True)
