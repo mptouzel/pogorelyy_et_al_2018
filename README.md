@@ -13,7 +13,7 @@ Code consists of a main python script (infer_diff_main.py), which makes use of f
 > `bash Anaconda-latest-Linux-x86_64.sh`
 2. download the repository and unarchive Yellow fever/Yellow_fever_S1_example test folder
 3. run following command in the repository rootpath (the first two arguments are the paths to the data files of the desired null model pair: biological replicates of day 0; the third and fourth arguments are the first and second time point to be compared), from the folder with repository
-> `python infer_diff_main.py S1_0_F1_.txt S1_0_F2_.txt S1_0_F1_.txt _S1_15_F1_.txt`
+> `python infer_diffexpr_main.py S1_0_F1_.txt S1_0_F2_.txt S1_0_F1_.txt S1_15_F1_.txt`
    
    This produces the results for a day0-day15 comparison using the first replicate of both, and using the day 0-replicate 1 and day 0-replicate 2 null model.
 4. Final output is located in outdata/S1_0_F1_S1_15_F1/min0_maxinf_S1_0_F1_S1_0_F2_v1_manu_version/S1_0_F1_S1_15_F1_tabletop_expanded.csv
